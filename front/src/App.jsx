@@ -15,7 +15,7 @@ function App() {
     setError(null)
     
     try {
-      const response = await fetch('http://localhost:8000/lookup', {
+      const response = await fetch('http://91.107.140.150:8000/lookup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ function App() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch('http://localhost:8000/history?limit=10')
+      const response = await fetch('http://91.107.140.150:8000/history?limit=10')
       const data = await response.json()
       setHistory(data)
     } catch (err) {

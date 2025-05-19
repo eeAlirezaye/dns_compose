@@ -19,10 +19,10 @@ app.add_middleware(
 )
 # main.py (updated DB_CONFIG)
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'user': os.getenv('DB_USER', 'minikubeuser'),  # Changed from 'root'
-    'password': os.getenv('DB_PASSWORD', 'your_minikubeuser_password'),
-    'database': os.getenv('DB_NAME', 'domain_lookup')
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),  # Changed from 'root'
+    'password': os.getenv('DB_PASSWORD'),
+    'database': os.getenv('DB_NAME')
 }
 # Models
 class DomainLookupRequest(BaseModel):

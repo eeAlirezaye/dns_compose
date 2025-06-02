@@ -20,9 +20,11 @@ app.add_middleware(
 # main.py (updated DB_CONFIG)
 DB_CONFIG = {
     'host': os.getenv('DB_HOST'),
-    'user': os.getenv('DB_USER'),  # Changed from 'root'
+    'user': os.getenv('DB_USER'),
     'password': os.getenv('DB_PASSWORD'),
-    'database': os.getenv('DB_NAME')
+    'database': os.getenv('DB_NAME'),
+    'port': int(os.getenv('DB_PORT', 3306)),
+    'consume_results': True  # Add this to automatically consume results
 }
 # Models
 class DomainLookupRequest(BaseModel):
@@ -122,6 +124,44 @@ async def get_history(limit: int = 10):
     conn.close()
     
     return results
+
+@app.get("/health")
+async def health_check():
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchall()  # Consume the result
+        cursor.close()
+        conn.close()
+        return {
+            "status": "healthy",
+            "database": "connected"
+        }
+    except mysql.connector.Error as e:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "unhealthy",
+                "database": "disconnected",
+                "error": str(e),
+                "config": {
+                    "host": DB_CONFIG['host'],
+                    "user": DB_CONFIG['user'],
+                    "database": DB_CONFIG['database']
+                }
+            }
+        )
+
+@app.get("/debug/config")
+async def debug_config():
+    return {
+        "DB_HOST": os.getenv('DB_HOST'),
+        "DB_USER": os.getenv('DB_USER'),
+        "DB_NAME": os.getenv('DB_NAME'),
+        "DB_PORT": os.getenv('DB_PORT'),
+        # Don't include DB_PASSWORD
+    }
 
 # Initialize database on startup
 @app.on_event("startup")

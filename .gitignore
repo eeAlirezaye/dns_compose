@@ -1,1 +1,19 @@
-back/.env
+# Dependencies
+node_modulesnode_modules
+__pycache____pycache__
+*.pyc*.pyc
+
+/back/.env
+
+/front/.env
+
+# Environment# Environment
+.env.env
+.env.local.env.local
+
+# Build# Build
+distdist
+buildbuild
+
+# Docker# Docker
+mysql_data

@@ -8,7 +8,7 @@ function App() {
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const API_URL = import.meta.env.VITE_API_URL
+  const API_URL = '/api'
 
   const handleSubmit = async (e) => {
     e.preventDefault()

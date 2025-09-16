@@ -1,27 +1,5 @@
 # mysql-deployment.yaml
 apiVersion: v1
-kind: Secret
-metadata:
-  name: mysql-secret
-  namespace: domain-lookup-app
-type: Opaque
-data:
-  # Base64 encoded values
-  mysql-root-password: cm9vdHBhc3N3b3Jk  # rootpassword
-  mysql-password: YWxpenRlc3Q=  # aliztest
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-config
-  namespace: domain-lookup-app
-data:
-  mysql-database: alizdb
-  mysql-user: aliz
-
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pvc
@@ -58,26 +36,35 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
-              key: mysql-root-password
+              name: app-secrets
+              key: MYSQL_ROOT_PASSWORD
         - name: MYSQL_DATABASE
           valueFrom:
             configMapKeyRef:
-              name: mysql-config
-              key: mysql-database
+              name: app-config
+              key: MYSQL_DATABASE
         - name: MYSQL_USER
           valueFrom:
             configMapKeyRef:
-              name: mysql-config
-              key: mysql-user
+              name: app-config
+              key: MYSQL_USER
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
-              key: mysql-password
+              name: app-secrets
+              key: MYSQL_PASSWORD
         volumeMounts:
         - name: mysql-storage
           mountPath: /var/lib/mysql
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "250m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
         livenessProbe:
           exec:
             command:
@@ -86,7 +73,8 @@ spec:
             - -h
             - localhost
           initialDelaySeconds: 30
-          timeoutSeconds: 5
+          timeoutSeconds: 10
+          periodSeconds: 10
         readinessProbe:
           exec:
             command:
@@ -95,7 +83,8 @@ spec:
             - -h
             - localhost
           initialDelaySeconds: 10
-          timeoutSeconds: 1
+          timeoutSeconds: 5
+          periodSeconds: 5
       volumes:
       - name: mysql-storage
         persistentVolumeClaim:
@@ -111,6 +100,6 @@ spec:
   selector:
     app: mysql
   ports:
-  - port: 3306dns/k8s
+  - port: 3306
     targetPort: 3306
-  clusterIP: None  # Headless service
+  type: ClusterIP

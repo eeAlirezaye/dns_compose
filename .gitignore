@@ -3,17 +3,18 @@ node_modulesnode_modules
 __pycache____pycache__
 *.pyc*.pyc
 
-/back/.env
+back/.env
+back/Dockerfile
 
-/front/.env
+front/.env
 
-# Environment# Environment
-.env.env
-.env.local.env.local
+# Environment
+.env
+.env.local
 
-# Build# Build
-distdist
-buildbuild
+# Build
+dist
+build
 
-# Docker# Docker
+# Docker
 mysql_data

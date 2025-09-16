@@ -1,0 +1,77 @@
+# config-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-service
+  namespace: domain-lookup-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: config-service
+  template:
+    metadata:
+      labels:
+        app: config-service
+    spec:
+      containers:
+      - name: config-service
+        image: spiritualguest/config-service:latest  # Update with your image
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_PORT
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_USER
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_NAME
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "250m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "1000Mi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-service
+  namespace: domain-lookup-app
+spec:
+  selector:
+    app: config-service
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP

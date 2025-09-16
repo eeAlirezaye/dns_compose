@@ -1,0 +1,67 @@
+# gateway-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+  namespace: domain-lookup-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+      - name: gateway
+        image: spiritualguest/gateway-service:latest  # Update with your image
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DNS_RESOLVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DNS_RESOLVER_URL
+        - name: DB_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_SERVICE_URL
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "250m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "1000Mi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: domain-lookup-app
+spec:
+  selector:
+    app: gateway-service
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP

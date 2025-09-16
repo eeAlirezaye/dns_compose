@@ -1,0 +1,20 @@
+# configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: domain-lookup-app
+data:
+  # Database configuration
+  DB_HOST: "mysql-service"
+  DB_PORT: "3306"
+  DB_USER: "aliz"
+  DB_NAME: "alizdb"
+  
+  # MySQL configuration
+  MYSQL_DATABASE: "alizdb"
+  MYSQL_USER: "aliz"
+  
+  # Service URLs for inter-service communication
+  DNS_RESOLVER_URL: "http://dns-resolver-service:8000/resolve"
+  DB_SERVICE_URL: "http://db-service:8000/lookups"

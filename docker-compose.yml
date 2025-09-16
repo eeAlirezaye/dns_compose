@@ -1,9 +1,11 @@
-# docker-compose.yml - For local testing
-version: '3.8'
+version: "3.9"
 
 services:
+  # ✅ Database
   db:
     image: mysql:8.0
+    container_name: mysql-db
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: alizdb
@@ -18,22 +20,76 @@ services:
       timeout: 20s
       retries: 10
 
-  backend:
+  # ✅ DNS Resolver Service
+  dns-resolver-service:
     build:
-      context: ./back
+      context: ./dns-resolver-service
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ✅ Database Service
+  db-service:
+    build:
+      context: ./db-service
+      dockerfile: Dockerfile
     environment:
       DB_HOST: db
       DB_PORT: 3306
       DB_USER: aliz
       DB_PASSWORD: aliztest
       DB_NAME: alizdb
+    ports:
+      - "8002:8000"
     depends_on:
       db:
         condition: service_healthy
 
+  # ✅ Gateway Service (main API for frontend)
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dns-resolver-service
+      - db-service
+
+  # ✅ Health Service
+  health-service:
+    build:
+      context: ./health-service
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: aliz
+      DB_PASSWORD: aliztest
+      DB_NAME: alizdb
+    ports:
+      - "8003:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ✅ Config Service
+  config-service:
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: aliz
+      DB_NAME: alizdb
+    ports:
+      - "8004:8000"
+
+  # ✅ Frontend
   frontend:
     build:
       context: ./front
@@ -41,7 +97,7 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      - gateway-service
 
 volumes:
   mysql_data:

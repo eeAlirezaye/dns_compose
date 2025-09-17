@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: spiritualguest/dns-frontend:latest  # Update with your image
+        image: spiritualguest/dns-frontend:latest  
         ports:
         - containerPort: 80
         resources:
@@ -44,7 +44,7 @@ spec:
   type: ClusterIP
 
 ---
-# Optional: Ingress for external access
+# Ingress for external access
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -65,8 +65,3 @@ spec:
             name: frontend-service
             port:
               number: 80
-  # Optional: TLS configuration
-  # tls:
-  # - hosts:
-  #   - dns-lookup.local
-  #   secretName: dns-lookup-tls

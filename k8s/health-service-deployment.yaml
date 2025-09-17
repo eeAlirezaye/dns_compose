@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: health-service
-        image: spiritualguest/health-service:latest  # Update with your image
+        image: spiritualguest/health-service:latest
         ports:
         - containerPort: 8000
         env:

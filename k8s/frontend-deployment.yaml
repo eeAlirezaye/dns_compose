@@ -19,25 +19,13 @@ spec:
         image: spiritualguest/dns-frontend:latest  # Update with your image
         ports:
         - containerPort: 80
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 5
         resources:
           requests:
-            memory: "100Mi"
-            cpu: "200m"
+            memory: "500Mi"
+            cpu: "250m"
             ephemeral-storage: "1Gi"
           limits:
-            memory: "250Mi"
+            memory: "1000Mi"
             cpu: "500m"
             ephemeral-storage: "2Gi"
 
@@ -67,7 +55,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: dns-lookup.local  # Change to your domain
+  - host: frontend-70264c5637-domain-lookup-app.apps.ir-central1.arvancaas.ir
     http:
       paths:
       - path: /

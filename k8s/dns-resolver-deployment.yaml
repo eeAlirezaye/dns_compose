@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: dns-resolver
-        image: spiritualguest/dns-resolver:latest  # Update with your image
+        image: spiritualguest/dns-resolver:latest  
         ports:
         - containerPort: 8000
         env:
@@ -45,18 +45,6 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: DB_PASSWORD
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 5
         resources:
           requests:
             memory: "500Mi"
@@ -66,7 +54,6 @@ spec:
             memory: "1000Mi"
             cpu: "500m"
             ephemeral-storage: "2Gi"
-
 ---
 apiVersion: v1
 kind: Service
